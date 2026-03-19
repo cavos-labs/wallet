@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useCavos } from '@cavos/react';
 import { SendModal } from './SendModal';
 import { ReceiveModal } from './ReceiveModal';
-import { AssetPickerModal } from './AssetPickerModal';
 import { SwapModal } from './SwapModal';
 import { USDC_ADDRESS, WBTC_ADDRESS } from '../providers';
 
@@ -71,7 +70,7 @@ export function WalletDashboard() {
 
   const handleFund = () => {
     try { window.open(getOnramp('RAMP_NETWORK'), '_blank', 'noopener,noreferrer'); }
-    catch { showToast('Fund is only available on mainnet'); }
+    catch { showToast('Funding is only available on mainnet'); }
   };
 
   const copyAddress = async () => {
@@ -95,167 +94,168 @@ export function WalletDashboard() {
     return n.toFixed(4);
   }
 
+  const isSettingUp = walletStatus.isDeploying || walletStatus.isRegistering;
   const statusLabel = walletStatus.isDeploying ? 'Setting up…' : walletStatus.isRegistering ? 'Almost ready…' : walletStatus.isReady ? 'Ready' : 'Starting…';
-  const statusColor = walletStatus.isReady ? '#3DD68C' : (walletStatus.isDeploying || walletStatus.isRegistering) ? '#F7931A' : 'var(--text-muted)';
+  const statusColor = walletStatus.isReady ? 'var(--green)' : isSettingUp ? 'var(--btc)' : 'var(--cream-muted)';
   const shortAddr = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : '';
   const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : user?.email ? user.email[0].toUpperCase() : '?';
   const firstName = user?.name?.split(' ')[0] || '';
 
   return (
-    <div className="min-h-dvh flex flex-col relative overflow-hidden" style={{ maxWidth: '420px', margin: '0 auto', padding: '0 20px 40px' }}>
-      {/* Ambient blobs */}
-      <div style={{ position: 'fixed', top: '5%', right: '-15%', width: '340px', height: '340px', background: 'radial-gradient(circle, rgba(247,147,26,0.06) 0%, transparent 65%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'fixed', bottom: '10%', left: '-15%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(39,117,202,0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
-
+    <div
+      className="min-h-dvh flex flex-col relative"
+      style={{ maxWidth: '420px', margin: '0 auto', padding: '0 20px 48px' }}
+    >
       {/* Header */}
-      <header className="page-entry flex items-center justify-between" style={{ paddingTop: '24px', paddingBottom: '8px' }}>
-        <Image src="/icon-black.png" alt="Cavos" width={26} height={26} style={{ filter: 'invert(1)', opacity: 0.6 }} />
+      <header className="page-entry flex items-center justify-between" style={{ paddingTop: '24px', paddingBottom: '4px' }}>
+        <Image src="/icon-black.png" alt="Cavos" width={24} height={24} style={{ filter: 'invert(1)', opacity: 0.5 }} />
         <div className="flex items-center gap-2">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '100px', padding: '4px 10px' }}>
-            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: statusColor, boxShadow: walletStatus.isReady ? `0 0 5px ${statusColor}` : 'none', display: 'inline-block', animation: (walletStatus.isDeploying || walletStatus.isRegistering) ? 'pulse 1.5s infinite' : 'none' }} />
-            <span style={{ fontSize: '10px', color: statusColor, fontFamily: 'DM Mono, monospace' }}>{statusLabel}</span>
+          {/* Status pill */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '5px',
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: '100px', padding: '4px 10px',
+          }}>
+            <span style={{
+              width: '5px', height: '5px', borderRadius: '50%',
+              background: statusColor,
+              boxShadow: walletStatus.isReady ? `0 0 6px var(--green)` : 'none',
+              display: 'inline-block',
+              animation: isSettingUp ? 'pulse 1.5s ease-in-out infinite' : 'none',
+            }} />
+            <span style={{ fontSize: '10px', color: statusColor, fontFamily: 'DM Mono, monospace', letterSpacing: '0.04em' }}>
+              {statusLabel}
+            </span>
           </div>
-          <button onClick={logout} title="Sign out" style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '11px', fontWeight: 500, color: 'var(--text-secondary)', transition: 'border-color 0.15s' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-hover)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'; }}
+          {/* Avatar / logout */}
+          <button
+            onClick={logout}
+            title="Sign out"
+            style={{
+              width: '30px', height: '30px', borderRadius: '50%',
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', fontSize: '11px', fontWeight: 500,
+              color: 'var(--cream-dim)', transition: 'border-color 0.15s',
+            }}
           >{initials}</button>
         </div>
       </header>
 
       {/* ── Total balance ── */}
-      <div className="page-entry page-entry-delay-1" style={{ paddingTop: '28px', paddingBottom: '24px' }}>
+      <div className="page-entry page-entry-delay-1" style={{ paddingTop: '32px', paddingBottom: '28px' }}>
         {firstName && (
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '6px', fontFamily: 'DM Mono, monospace' }}>
-            Hey, {firstName}
+          <p style={{ fontSize: '11px', color: 'var(--cream-muted)', marginBottom: '8px', fontFamily: 'DM Mono, monospace', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            {firstName}
           </p>
         )}
         {isLoading
-          ? <div className="shimmer" style={{ width: '150px', height: '56px', borderRadius: '12px' }} />
-          : <p className="font-display" style={{ fontSize: '56px', color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1 }}>{fmt(totalUsd)}</p>
+          ? <div className="shimmer" style={{ width: '160px', height: '64px', borderRadius: '12px' }} />
+          : (
+            <p
+              className="font-display"
+              style={{ fontSize: 'clamp(52px, 14vw, 72px)', color: 'var(--cream)', letterSpacing: '-0.03em', lineHeight: 1 }}
+            >
+              {fmt(totalUsd)}
+            </p>
+          )
         }
 
-        {/* Address — compact, secondary */}
-        <button onClick={copyAddress}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '10px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+        {/* Address */}
+        <button
+          onClick={copyAddress}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '12px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
         >
-          <span style={{ fontFamily: 'DM Mono, monospace', fontSize: '11px', color: 'var(--text-muted)' }}>{shortAddr}</span>
+          <span style={{ fontFamily: 'DM Mono, monospace', fontSize: '11px', color: 'var(--cream-muted)' }}>{shortAddr}</span>
           {addrCopied
-            ? <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="#3DD68C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            : <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="var(--text-muted)" strokeWidth="1.2" /><path d="M8 4V3a1 1 0 00-1-1H3a1 1 0 00-1 1v4a1 1 0 001 1h1" stroke="var(--text-muted)" strokeWidth="1.2" /></svg>
+            ? <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="var(--green)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            : <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="var(--cream-muted)" strokeWidth="1.2" /><path d="M8 4V3a1 1 0 00-1-1H3a1 1 0 00-1 1v4a1 1 0 001 1h1" stroke="var(--cream-muted)" strokeWidth="1.2" /></svg>
           }
         </button>
       </div>
 
       {/* ── ACCOUNT card (USDC) ── */}
-      <div className="page-entry page-entry-delay-2" style={{
-        background: 'linear-gradient(135deg, rgba(39,117,202,0.12) 0%, rgba(39,117,202,0.04) 100%)',
-        border: '1px solid rgba(39,117,202,0.2)',
-        borderRadius: '22px', padding: '20px', marginBottom: '10px',
-        position: 'relative', overflow: 'hidden',
-      }}>
-        {/* Top row: label + balance */}
-        <div className="flex items-center justify-between" style={{ marginBottom: '20px' }}>
-          <div className="flex items-center gap-2">
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#2775CA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 1.5A6.5 6.5 0 101.5 8 6.5 6.5 0 008 1.5zm0 11.5A5 5 0 1113 8a5 5 0 01-5 5z" fill="white" fillOpacity="0.4" />
-                <path d="M8.4 7.66c-.86-.23-1.15-.47-1.15-.84 0-.42.39-.7 1.04-.7.68 0 .93.32.95.8h.84c-.03-.66-.43-1.27-1.23-1.47V4.8h-1.1v.64c-.76.16-1.36.64-1.36 1.38 0 .88.72 1.32 1.79 1.57.95.22 1.14.56 1.14.9 0 .26-.18.68-1.04.68-.8 0-1.1-.35-1.15-.8H6.5c.06.84.67 1.3 1.41 1.47v.66h1.1v-.65c.76-.14 1.36-.58 1.36-1.36 0-1.04-.9-1.4-1.97-1.63z" fill="white" />
-              </svg>
-            </div>
-            <div>
-              <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text)', lineHeight: 1.2 }}>Account</p>
-              <p style={{ fontSize: '11px', color: 'rgba(39,117,202,0.8)' }}>USD Coin</p>
-            </div>
+      <div className="section-card usdc page-entry page-entry-delay-2" style={{ padding: '22px', marginBottom: '12px' }}>
+        {/* Label row */}
+        <div className="flex items-center justify-between" style={{ marginBottom: '18px' }}>
+          <div>
+            <p style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--usdc)', marginBottom: '2px' }}>
+              Account
+            </p>
+            <p style={{ fontSize: '10px', color: 'var(--cream-muted)', fontFamily: 'DM Mono, monospace' }}>USD Coin</p>
           </div>
-
           {isLoading
-            ? <div className="shimmer" style={{ width: '80px', height: '32px', borderRadius: '8px' }} />
+            ? <div className="shimmer" style={{ width: '80px', height: '36px', borderRadius: '8px' }} />
             : (
               <div style={{ textAlign: 'right' }}>
-                <p className="font-display" style={{ fontSize: '28px', color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1 }}>{fmt(usdcN)}</p>
-                <p style={{ fontSize: '10px', color: 'rgba(39,117,202,0.7)', fontFamily: 'DM Mono, monospace', marginTop: '2px' }}>available</p>
+                <p className="font-display" style={{ fontSize: '32px', color: 'var(--cream)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                  {fmt(usdcN)}
+                </p>
+                <p style={{ fontSize: '10px', color: 'var(--cream-muted)', fontFamily: 'DM Mono, monospace', marginTop: '3px' }}>available</p>
               </div>
             )
           }
         </div>
 
-        {/* Fund: hero button full-width */}
-        <button onClick={handleFund}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', background: '#3DD68C', border: 'none', borderRadius: '14px', padding: '14px', cursor: 'pointer', fontSize: '15px', fontWeight: 600, color: '#0A0A0C', marginBottom: '8px', transition: 'opacity 0.15s, transform 0.15s' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.9'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'; }}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        {/* Fund: hero CTA */}
+        <button className="btn-fund" onClick={handleFund} style={{ marginBottom: '8px' }}>
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
             <path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
           Add money
         </button>
 
-        {/* Send / Receive: secondary row */}
+        {/* Send / Receive */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <button onClick={() => setModal({ type: 'send', asset: 'USDC' })}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '11px', cursor: 'pointer', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', transition: 'background 0.15s' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.1)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; }}
-          >
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M3 11l8-8M11 3H5M11 3v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <button className="btn-secondary" onClick={() => setModal({ type: 'send', asset: 'USDC' })}>
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 11l8-8M11 3H5M11 3v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
             Send
           </button>
-          <button onClick={() => setModal({ type: 'receive', asset: 'USDC' })}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '11px', cursor: 'pointer', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', transition: 'background 0.15s' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.1)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; }}
-          >
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M11 3L3 11M3 11h6M3 11V5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <button className="btn-secondary" onClick={() => setModal({ type: 'receive', asset: 'USDC' })}>
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M11 3L3 11M3 11h6M3 11V5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
             Receive
           </button>
         </div>
 
-        {/* Empty state */}
         {!isLoading && usdcN === 0 && (
-          <p style={{ fontSize: '11px', color: 'rgba(39,117,202,0.6)', textAlign: 'center', marginTop: '10px', fontFamily: 'DM Mono, monospace' }}>
+          <p style={{ fontSize: '11px', color: 'var(--cream-muted)', textAlign: 'center', marginTop: '12px', fontFamily: 'DM Mono, monospace' }}>
             Add money to start buying Bitcoin
           </p>
         )}
       </div>
 
       {/* ── BITCOIN card ── */}
-      <div className="page-entry page-entry-delay-3" style={{
-        background: 'linear-gradient(135deg, rgba(247,147,26,0.1) 0%, rgba(247,147,26,0.03) 100%)',
-        border: '1px solid rgba(247,147,26,0.18)',
-        borderRadius: '22px', padding: '20px',
-        position: 'relative', overflow: 'hidden',
-      }}>
-        {/* Top row: label + balance */}
+      <div className="section-card btc page-entry page-entry-delay-3" style={{ padding: '22px' }}>
+        {/* Label row */}
         <div className="flex items-start justify-between" style={{ marginBottom: '20px' }}>
-          <div className="flex items-center gap-2">
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#F7931A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                <path d="M13.7 8.8c.2-1.3-.8-2-2.1-2.4l.4-1.8-1.1-.3-.4 1.7-.7-.2.4-1.7-1.1-.3-.5 1.8-1.6-.4-.3 1.1.8.2c.4.1.5.4.5.7L7.4 9.7l-.2.1.2.1-.8 3.1c-.1.2-.3.4-.6.4l-.8-.2-.6 1.2 1.6.4.6.2-.5 1.8 1.1.3.5-1.8.7.2-.5 1.8 1.1.3.5-1.8c2.1.4 3.7.2 4.4-1.7.6-1.5-.1-2.4-1.1-2.9.7-.2 1.3-.8 1.5-1.9zm-2.6 3.6c-.4 1.5-3.1.7-4 .5l.7-2.9c.9.2 3.7.6 3.3 2.4zm.5-3.6c-.4 1.4-2.7.7-3.5.5l.6-2.5c.8.2 3.3.5 2.9 2z" fill="white" />
-              </svg>
-            </div>
-            <div>
-              <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text)', lineHeight: 1.2 }}>Bitcoin</p>
-              <p style={{ fontSize: '11px', color: 'rgba(247,147,26,0.8)' }}>BTC</p>
-            </div>
+          <div>
+            <p style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--btc)', marginBottom: '2px' }}>
+              Bitcoin
+            </p>
+            <p style={{ fontSize: '10px', color: 'var(--cream-muted)', fontFamily: 'DM Mono, monospace' }}>BTC</p>
           </div>
-
           {isLoading
-            ? <div className="shimmer" style={{ width: '110px', height: '40px', borderRadius: '8px' }} />
+            ? <div className="shimmer" style={{ width: '110px', height: '44px', borderRadius: '8px' }} />
             : btcN === 0
             ? (
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '13px', color: 'rgba(247,147,26,0.5)', fontStyle: 'italic' }}>No Bitcoin yet</p>
-                <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', fontFamily: 'DM Mono, monospace' }}>1 BTC ≈ {fmt(BTC_PRICE_USD)}</p>
+                <p style={{ fontSize: '13px', color: 'var(--cream-muted)', fontStyle: 'italic', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+                  No Bitcoin yet
+                </p>
+                <p style={{ fontSize: '10px', color: 'var(--cream-muted)', marginTop: '3px', fontFamily: 'DM Mono, monospace' }}>
+                  1 BTC ≈ {fmt(BTC_PRICE_USD)}
+                </p>
               </div>
             )
             : (
               <div style={{ textAlign: 'right' }}>
-                <p className="font-display" style={{ fontSize: '28px', color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                <p className="font-display" style={{ fontSize: '32px', color: 'var(--cream)', letterSpacing: '-0.02em', lineHeight: 1 }}>
                   {fmtBtc(btcN)}
-                  <span style={{ fontSize: '13px', color: 'rgba(247,147,26,0.7)', marginLeft: '4px' }}>BTC</span>
+                  <span style={{ fontSize: '14px', color: 'var(--btc)', marginLeft: '5px', opacity: 0.8 }}>BTC</span>
                 </p>
-                <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'DM Mono, monospace', marginTop: '2px' }}>{fmt(btcUsd)}</p>
+                <p style={{ fontSize: '11px', color: 'var(--cream-muted)', fontFamily: 'DM Mono, monospace', marginTop: '3px' }}>
+                  {fmt(btcUsd)}
+                </p>
               </div>
             )
           }
@@ -263,39 +263,25 @@ export function WalletDashboard() {
 
         {/* Buy / Sell */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: btcN > 0 ? '8px' : '0' }}>
-          <button onClick={() => setModal({ type: 'buy' })}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'var(--text)', border: 'none', borderRadius: '14px', padding: '13px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, color: 'var(--bg)', transition: 'opacity 0.15s, transform 0.15s' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.88'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'; }}
-          >
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+          <button className="btn-buy" onClick={() => setModal({ type: 'buy' })}>
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
             Buy
           </button>
-          <button onClick={() => setModal({ type: 'sell' })} disabled={btcN === 0}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: btcN > 0 ? 'rgba(255,255,255,0.06)' : 'transparent', border: `1px solid ${btcN > 0 ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)'}`, borderRadius: '14px', padding: '13px', cursor: btcN === 0 ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 500, color: btcN === 0 ? 'var(--text-muted)' : 'var(--text-secondary)', opacity: btcN === 0 ? 0.35 : 1, transition: 'background 0.15s' }}
-            onMouseEnter={e => { if (btcN > 0) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.1)'; }}
-            onMouseLeave={e => { if (btcN > 0) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; }}
-          >
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+          <button className="btn-sell" onClick={() => setModal({ type: 'sell' })} disabled={btcN === 0}>
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 7h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
             Sell
           </button>
         </div>
 
-        {/* Send / Receive BTC — only shown when has balance */}
+        {/* Send / Receive BTC — only when has balance */}
         {btcN > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-            <button onClick={() => setModal({ type: 'send', asset: 'BTC' })}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '9px', cursor: 'pointer', fontSize: '12px', color: 'var(--text-muted)', transition: 'background 0.15s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'; }}
-            >
+            <button className="btn-secondary" onClick={() => setModal({ type: 'send', asset: 'BTC' })}>
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 11l8-8M11 3H5M11 3v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
               Send BTC
             </button>
-            <button onClick={() => setModal({ type: 'receive', asset: 'BTC' })}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '9px', cursor: 'pointer', fontSize: '12px', color: 'var(--text-muted)', transition: 'background 0.15s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'; }}
-            >
+            <button className="btn-secondary" onClick={() => setModal({ type: 'receive', asset: 'BTC' })}>
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M11 3L3 11M3 11h6M3 11V5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
               Receive BTC
             </button>
           </div>
@@ -303,15 +289,30 @@ export function WalletDashboard() {
       </div>
 
       {/* Footer */}
-      <div className="page-entry page-entry-delay-4" style={{ marginTop: '24px', textAlign: 'center' }}>
-        <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'DM Mono, monospace', opacity: 0.6 }}>Transfers are always free</p>
+      <div className="page-entry page-entry-delay-4" style={{ marginTop: '28px', textAlign: 'center' }}>
+        <p style={{ fontSize: '10px', color: 'var(--cream-muted)', fontFamily: 'DM Mono, monospace', letterSpacing: '0.04em' }}>
+          Transfers are always free
+        </p>
       </div>
 
       {/* Modals */}
-      {modal?.type === 'send' && <SendModal asset={modal.asset} balance={modal.asset === 'BTC' ? btc : usdc} onClose={() => setModal(null)} onSend={async (to, amt) => { await handleSend(modal.asset, to, amt); }} />}
-      {modal?.type === 'receive' && address && <ReceiveModal asset={modal.asset} address={address} onClose={() => setModal(null)} />}
-      {modal?.type === 'buy' && address && <SwapModal direction="buy" usdcBalance={usdc} btcBalance={btc} address={address} onClose={() => setModal(null)} onSwap={handleSwap} />}
-      {modal?.type === 'sell' && address && <SwapModal direction="sell" usdcBalance={usdc} btcBalance={btc} address={address} onClose={() => setModal(null)} onSwap={handleSwap} />}
+      {modal?.type === 'send' && (
+        <SendModal
+          asset={modal.asset}
+          balance={modal.asset === 'BTC' ? btc : usdc}
+          onClose={() => setModal(null)}
+          onSend={async (to, amt) => { await handleSend(modal.asset, to, amt); }}
+        />
+      )}
+      {modal?.type === 'receive' && address && (
+        <ReceiveModal asset={modal.asset} address={address} onClose={() => setModal(null)} />
+      )}
+      {modal?.type === 'buy' && address && (
+        <SwapModal direction="buy" usdcBalance={usdc} btcBalance={btc} address={address} onClose={() => setModal(null)} onSwap={handleSwap} />
+      )}
+      {modal?.type === 'sell' && address && (
+        <SwapModal direction="sell" usdcBalance={usdc} btcBalance={btc} address={address} onClose={() => setModal(null)} onSwap={handleSwap} />
+      )}
 
       {toast && <div className="toast">{toast}</div>}
       <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
