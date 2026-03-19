@@ -24,23 +24,24 @@ type ModalState =
 
 type Tab = 'account' | 'bitcoin';
 
-function UsdcIcon() {
+/* ── Icon components ── */
+function UsdcIcon({ size = 42 }: { size?: number }) {
   return (
-    <div className="asset-icon" style={{ background: '#2775CA' }}>
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-        <circle cx="16" cy="16" r="16" fill="#2775CA" />
-        <path d="M20.022 18.124c0-2.124-1.28-2.852-3.84-3.156-1.828-.234-2.194-.702-2.194-1.518 0-.816.61-1.356 1.828-1.356 1.1 0 1.708.39 2.012 1.35.064.195.234.312.445.312h1.017a.42.42 0 00.423-.423v-.058a3.277 3.277 0 00-2.93-2.685V9.384a.45.45 0 00-.45-.45h-.966a.45.45 0 00-.45.45v1.17c-1.65.234-2.7 1.296-2.7 2.7 0 2.01 1.216 2.793 3.776 3.097 1.7.312 2.258.702 2.258 1.635 0 .933-.818 1.57-1.944 1.57-1.524 0-2.07-.643-2.24-1.575-.044-.234-.234-.39-.468-.39h-1.075a.42.42 0 00-.423.423v.058c.234 1.7 1.368 2.91 3.152 3.21v1.185c0 .248.202.45.45.45h.966a.45.45 0 00.45-.45V21.86c1.66-.312 2.673-1.44 2.673-2.934l-.001-.802z" fill="white" />
+    <div style={{ width: size, height: size, borderRadius: 12, background: 'rgba(39,117,202,0.15)', border: '1px solid rgba(39,117,202,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <svg width={size * 0.52} height={size * 0.52} viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="#2775CA" strokeWidth="1.5" />
+        <path d="M15 8.5C14.3 7.3 13.1 6.5 11.5 6.5c-2.5 0-4.5 2-4.5 5s2 5 4.5 5c1.6 0 2.8-.8 3.5-2M12 9v1.5M12 13.5V15" stroke="#2775CA" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M9.5 10.5h4c.6 0 1 .4 1 1s-.4 1-1 1h-4c-.6 0-1 .4-1 1s.4 1 1 1h4" stroke="#2775CA" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     </div>
   );
 }
 
-function BtcIcon() {
+function BtcIcon({ size = 42 }: { size?: number }) {
   return (
-    <div className="asset-icon" style={{ background: '#F7931A' }}>
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-        <circle cx="16" cy="16" r="16" fill="#F7931A" />
-        <path d="M22.2 13.8c.3-2-.8-3-2.8-3.6l.6-2.5-1.5-.4-.6 2.4-.9-.2.6-2.4-1.5-.4-.6 2.5-2.1-.5-.4 1.5 1.1.3c.5.1.7.5.6.9l-1.5 6c-.1.3-.4.6-.8.5l-1.1-.3-.8 1.6 2.1.5.7.2-.6 2.5 1.5.4.6-2.5.9.2-.6 2.5 1.5.4.6-2.5c2.8.5 4.9.3 5.8-2.2.7-2-.1-3.2-1.5-3.9.9-.3 1.7-1 1.9-2.5zm-3.5 4.9c-.5 2-4 .9-5.2.6l.9-3.7c1.2.3 4.9.9 4.3 3.1zm.6-5c-.5 1.8-3.5 1-4.6.7l.8-3.3c1.1.3 4.3.8 3.8 2.6z" fill="white" />
+    <div style={{ width: size, height: size, borderRadius: 12, background: 'rgba(247,147,26,0.12)', border: '1px solid rgba(247,147,26,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <svg width={size * 0.5} height={size * 0.5} viewBox="0 0 24 24" fill="none">
+        <path d="M9 8h5.5a2 2 0 010 4H9M9 12h6a2 2 0 010 4H9M9 8V6M9 16v2M12 8V6M12 16v2" stroke="#F7931A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </div>
   );
@@ -48,14 +49,14 @@ function BtcIcon() {
 
 export function WalletDashboard() {
   const { address, user, logout, execute, getOnramp, walletStatus } = useCavos();
-  const [modal, setModal] = useState<ModalState>(null);
-  const [activeTab, setActiveTab] = useState<Tab>('account');
-  const [btc, setBtc] = useState('0');
-  const [usdc, setUsdc] = useState('0');
-  const [isLoading, setIsLoading] = useState(true);
+  const [modal, setModal]             = useState<ModalState>(null);
+  const [activeTab, setActiveTab]     = useState<Tab>('account');
+  const [btc, setBtc]                 = useState('0');
+  const [usdc, setUsdc]               = useState('0');
+  const [isLoading, setIsLoading]     = useState(true);
   const [balanceHidden, setBalanceHidden] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const [addrCopied, setAddrCopied] = useState(false);
+  const [toast, setToast]             = useState<string | null>(null);
+  const [addrCopied, setAddrCopied]   = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -80,9 +81,9 @@ export function WalletDashboard() {
 
   const handleSend = async (asset: 'BTC' | 'USDC', to: string, amount: string) => {
     const addr = asset === 'BTC' ? WBTC_ADDRESS : USDC_ADDRESS;
-    const dec = asset === 'BTC' ? 8 : 6;
-    const wei = BigInt(Math.floor(parseFloat(amount) * 10 ** dec));
-    const m = (BigInt(1) << BigInt(128)) - BigInt(1);
+    const dec  = asset === 'BTC' ? 8 : 6;
+    const wei  = BigInt(Math.floor(parseFloat(amount) * 10 ** dec));
+    const m    = (BigInt(1) << BigInt(128)) - BigInt(1);
     const hash = await execute({ contractAddress: addr, entrypoint: 'transfer', calldata: [to, (wei & m).toString(), (wei >> BigInt(128)).toString()] });
     showToast(`Sent · ${hash.slice(0, 10)}…`);
     setTimeout(fetchBalances, 5000);
@@ -90,7 +91,7 @@ export function WalletDashboard() {
 
   const handleSwap = async (calls: Call[]) => {
     const hash = await execute(calls);
-    showToast(`Swapped · ${hash.slice(0, 10)}…`);
+    showToast(`Done · ${hash.slice(0, 10)}…`);
     setTimeout(fetchBalances, 8000);
   };
 
@@ -106,55 +107,55 @@ export function WalletDashboard() {
     setTimeout(() => setAddrCopied(false), 2000);
   };
 
-  const btcN  = parseFloat(btc);
-  const usdcN = parseFloat(usdc);
-  const btcUsd    = btcN * BTC_PRICE_USD;
-  const totalUsd  = btcUsd + usdcN;
+  const btcN    = parseFloat(btc);
+  const usdcN   = parseFloat(usdc);
+  const btcUsd  = btcN * BTC_PRICE_USD;
+  const totalUsd = btcUsd + usdcN;
 
-  function fmt(n: number) {
-    return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-  function fmtBtc(n: number) {
+  const fmtUsd = (n: number) =>
+    `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const fmtBtc = (n: number) => {
     if (n === 0) return '0.0000';
     if (n < 0.0001) return n.toFixed(8);
     return n.toFixed(4);
-  }
+  };
 
-  const isSettingUp = walletStatus.isDeploying || walletStatus.isRegistering;
-  const statusLabel = isSettingUp ? 'Setting up…' : walletStatus.isReady ? 'Ready' : 'Starting…';
-  const shortAddr = address ? `${address.slice(0, 8)}…${address.slice(-6)}` : '';
-  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : user?.email ? user.email[0].toUpperCase() : '?';
+  const isSettingUp  = walletStatus.isDeploying || walletStatus.isRegistering;
+  const statusLabel  = isSettingUp ? 'Setting up…' : walletStatus.isReady ? 'Ready' : 'Starting…';
+  const shortAddr    = address ? `${address.slice(0, 8)}…${address.slice(-6)}` : '';
+  const initials     = user?.name
+    ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : user?.email ? user.email[0].toUpperCase() : '?';
+
+  /* shared icon stroke for action buttons */
+  const iconStroke = 'var(--accent)';
 
   return (
-    <div style={{ maxWidth: '430px', margin: '0 auto', minHeight: '100dvh', display: 'flex', flexDirection: 'column', padding: '0 20px 48px', position: 'relative' }}>
+    <div style={{ maxWidth: '430px', margin: '0 auto', minHeight: '100dvh', display: 'flex', flexDirection: 'column', padding: '0 20px 56px' }}>
 
       {/* ── Header ── */}
       <header className="page-entry" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '20px', paddingBottom: '4px' }}>
-        {/* Settings placeholder */}
-        <button style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--surface)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="10" r="2" stroke="var(--text-2)" strokeWidth="1.5" />
-            <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.34 4.34l1.42 1.42M14.24 14.24l1.42 1.42M4.34 15.66l1.42-1.42M14.24 5.76l1.42-1.42" stroke="var(--text-2)" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </button>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Image src="/icon-black.png" alt="Cavos" width={22} height={22} style={{ filter: 'invert(1)', opacity: 0.55 }} />
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--text-2)', textTransform: 'uppercase' }}>Cavos</span>
+        </div>
 
-        {/* Status badge */}
+        {/* Status */}
         <div style={{
-          display: 'flex', alignItems: 'center', gap: '6px',
-          background: isSettingUp ? 'rgba(255,107,53,0.15)' : 'var(--surface)',
-          border: `1px solid ${isSettingUp ? 'rgba(255,107,53,0.3)' : 'var(--border)'}`,
-          borderRadius: '100px', padding: '6px 12px',
+          display: 'flex', alignItems: 'center', gap: '5px',
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: '100px', padding: '5px 11px',
         }}>
-          <Image src="/icon-black.png" alt="" width={14} height={14} style={{ filter: 'invert(1)', opacity: 0.7 }} />
-          <span style={{ fontSize: '13px', fontWeight: 500, color: isSettingUp ? 'var(--accent)' : 'var(--text)', letterSpacing: '-0.01em' }}>
-            {statusLabel}
-          </span>
-          {isSettingUp && (
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ animation: 'spin 1s linear infinite' }}>
-              <circle cx="6" cy="6" r="4.5" stroke="var(--accent)" strokeWidth="1.5" strokeOpacity="0.3" />
-              <path d="M6 1.5a4.5 4.5 0 014.5 4.5" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          )}
+          <span style={{
+            width: '6px', height: '6px', borderRadius: '50%',
+            background: isSettingUp ? 'var(--accent)' : walletStatus.isReady ? 'var(--green)' : 'var(--text-3)',
+            boxShadow: walletStatus.isReady ? '0 0 6px var(--green)' : 'none',
+            animation: isSettingUp ? 'pulse 1.4s ease-in-out infinite' : 'none',
+            display: 'inline-block',
+          }} />
+          <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-2)', letterSpacing: '0.01em' }}>{statusLabel}</span>
         </div>
 
         {/* Avatar */}
@@ -162,245 +163,216 @@ export function WalletDashboard() {
           onClick={logout}
           title="Sign out"
           style={{
-            width: '36px', height: '36px', borderRadius: '50%',
+            width: '34px', height: '34px', borderRadius: '10px',
             background: 'var(--surface)', border: '1px solid var(--border)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: 'var(--text-2)',
+            cursor: 'pointer', fontSize: '11px', fontWeight: 600,
+            color: 'var(--text-2)', letterSpacing: '0.02em',
           }}
         >{initials}</button>
       </header>
 
-      {/* ── Balance + address ── */}
-      <div className="page-entry page-entry-delay-1" style={{ textAlign: 'center', paddingTop: '40px', paddingBottom: '36px' }}>
+      {/* ── Balance ── */}
+      <div className="page-entry page-entry-delay-1" style={{ textAlign: 'center', paddingTop: '44px', paddingBottom: '32px' }}>
         {isLoading ? (
-          <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', marginBottom: '16px' }}>
-            {[...Array(7)].map((_, i) => (
-              <div key={i} className="shimmer" style={{ width: '12px', height: '12px', borderRadius: '50%' }} />
-            ))}
-          </div>
+          <div className="shimmer" style={{ width: '160px', height: '56px', borderRadius: '12px', margin: '0 auto 20px' }} />
         ) : balanceHidden ? (
-          <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', marginBottom: '16px' }}>
-            {[...Array(7)].map((_, i) => (
-              <div key={i} style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'var(--text-2)' }} />
+          <div style={{ display: 'flex', gap: '7px', justifyContent: 'center', alignItems: 'center', height: '60px', marginBottom: '8px' }}>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--text-2)' }} />
             ))}
           </div>
         ) : (
-          <p style={{ fontSize: 'clamp(42px, 12vw, 58px)', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '8px' }}>
-            {fmt(totalUsd)}
+          <p style={{ fontSize: 'clamp(40px, 11vw, 56px)', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '8px' }}>
+            {fmtUsd(totalUsd)}
           </p>
         )}
 
-        {/* Show/hide toggle */}
         <button
           onClick={() => setBalanceHidden(h => !h)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px', marginBottom: '16px' }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 8px', borderRadius: '8px' }}
         >
-          {balanceHidden
-            ? <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4C5 4 1 10 1 10s4 6 9 6 9-6 9-6-4-6-9-6zm0 9a3 3 0 110-6 3 3 0 010 6z" stroke="var(--text-2)" strokeWidth="1.5" /></svg>
-            : <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M3 3l14 14M10 4C5 4 1 10 1 10s1.6 2.4 4 4M17 8c1.1 1.2 2 2 2 2s-4 6-9 6a8 8 0 01-3.5-.8" stroke="var(--text-2)" strokeWidth="1.5" strokeLinecap="round" /></svg>
-          }
-          <span style={{ fontSize: '13px', color: 'var(--text-2)', fontWeight: 500 }}>
-            {balanceHidden ? 'Show balance' : 'Hide balance'}
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none">
+            {balanceHidden
+              ? <path d="M10 4C5 4 1 10 1 10s4 6 9 6 9-6 9-6-4-6-9-6zm0 9a3 3 0 110-6 3 3 0 010 6z" stroke="var(--text-3)" strokeWidth="1.5" />
+              : <path d="M3 3l14 14M10 4C5 4 1 10 1 10s1.6 2.4 4 4M17 8c1.1 1.2 2 2 2 2s-4 6-9 6a8 8 0 01-3.5-.8" stroke="var(--text-3)" strokeWidth="1.5" strokeLinecap="round" />
+            }
+          </svg>
+          <span style={{ fontSize: '12px', color: 'var(--text-3)', fontWeight: 500 }}>
+            {balanceHidden ? 'Show' : 'Hide'}
           </span>
         </button>
 
-        {/* Address pill */}
-        <div>
+        {/* Address */}
+        <div style={{ marginTop: '14px' }}>
           <button
             onClick={copyAddress}
             style={{
-              background: 'var(--surface)', border: '1px solid var(--border)',
-              borderRadius: '100px', padding: '7px 14px',
               display: 'inline-flex', alignItems: 'center', gap: '6px',
-              cursor: 'pointer', transition: 'border-color 0.15s',
+              background: 'var(--surface-2)', border: '1px solid var(--border)',
+              borderRadius: '10px', padding: '6px 12px', cursor: 'pointer',
+              transition: 'border-color 0.15s',
             }}
           >
-            <span style={{ fontFamily: 'ui-monospace, SF Mono, monospace', fontSize: '12px', color: 'var(--text-2)' }}>{shortAddr}</span>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '11px', color: 'var(--text-2)' }}>{shortAddr}</span>
             {addrCopied
-              ? <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="var(--green)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              : <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="var(--text-2)" strokeWidth="1.2" /><path d="M8 4V3a1 1 0 00-1-1H3a1 1 0 00-1 1v4a1 1 0 001 1h1" stroke="var(--text-2)" strokeWidth="1.2" /></svg>
+              ? <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5L10 3" stroke="var(--green)" strokeWidth="1.5" strokeLinecap="round" /></svg>
+              : <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="var(--text-3)" strokeWidth="1.2" /><path d="M8 4V3a1 1 0 00-1-1H3a1 1 0 00-1 1v4a1 1 0 001 1h1" stroke="var(--text-3)" strokeWidth="1.2" /></svg>
             }
           </button>
         </div>
       </div>
 
       {/* ── Action buttons ── */}
-      <div className="page-entry page-entry-delay-2" style={{ display: 'flex', justifyContent: 'space-around', paddingBottom: '36px' }}>
+      <div className="action-row page-entry page-entry-delay-2" style={{ marginBottom: '32px' }}>
+        {/* Fund */}
         <button className="action-btn" onClick={handleFund}>
           <div className="action-btn-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke={iconStroke} strokeWidth="2" strokeLinecap="round" />
             </svg>
           </div>
           <span className="action-btn-label">Fund</span>
         </button>
 
+        {/* Send */}
         <button className="action-btn" onClick={() => setModal({ type: 'send', asset: activeTab === 'bitcoin' ? 'BTC' : 'USDC' })}>
           <div className="action-btn-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M22 2L11 13" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M22 2L15 22 11 13 2 9l20-7z" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M5 19L19 5M19 5H10M19 5v9" stroke={iconStroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <span className="action-btn-label">Send</span>
         </button>
 
+        {/* Receive */}
         <button className="action-btn" onClick={() => setModal({ type: 'receive', asset: activeTab === 'bitcoin' ? 'BTC' : 'USDC' })}>
           <div className="action-btn-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 19V5M5 12l7 7 7-7" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M19 5L5 19M5 19h9M5 19v-9" stroke={iconStroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <span className="action-btn-label">Receive</span>
         </button>
 
-        <button className="action-btn" onClick={() => setModal({ type: 'buy' })}>
+        {/* Swap */}
+        <button className="action-btn" onClick={() => setModal({ type: btcN > 0 ? 'sell' : 'buy' })}>
           <div className="action-btn-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M7 16L17 6M17 6H9M17 6v8" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M7 16V4M7 4L4 7M7 4l3 3" stroke={iconStroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M17 8v12M17 20l3-3M17 20l-3-3" stroke={iconStroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <span className="action-btn-label">Buy BTC</span>
+          <span className="action-btn-label">Swap</span>
         </button>
       </div>
 
-      {/* ── Tabs ── */}
-      <div className="page-entry page-entry-delay-3">
-        <div className="tab-bar">
-          <button
-            className={`tab-item${activeTab === 'account' ? ' active' : ''}`}
-            onClick={() => setActiveTab('account')}
-          >
-            Cash
-          </button>
-          <button
-            className={`tab-item${activeTab === 'bitcoin' ? ' active' : ''}`}
-            onClick={() => setActiveTab('bitcoin')}
-          >
-            Bitcoin
-          </button>
+      {/* ── Tabs + asset list ── */}
+      <div className="page-entry page-entry-delay-3" style={{ flex: 1 }}>
+        <div className="tab-bar" style={{ marginBottom: '4px' }}>
+          <button className={`tab-item${activeTab === 'account' ? ' active' : ''}`} onClick={() => setActiveTab('account')}>Cash</button>
+          <button className={`tab-item${activeTab === 'bitcoin' ? ' active' : ''}`} onClick={() => setActiveTab('bitcoin')}>Bitcoin</button>
         </div>
 
-        {/* ── Asset rows ── */}
-        <div style={{ paddingTop: '8px' }}>
-          {activeTab === 'account' && (
+        {/* USDC tab */}
+        {activeTab === 'account' && (
+          isLoading ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 0' }}>
+              <div className="shimmer" style={{ width: '42px', height: '42px', borderRadius: '12px' }} />
+              <div><div className="shimmer" style={{ width: '70px', height: '13px', marginBottom: '6px' }} /><div className="shimmer" style={{ width: '45px', height: '11px' }} /></div>
+            </div>
+          ) : (
             <>
-              {isLoading ? (
-                <div style={{ padding: '16px 0', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div className="shimmer" style={{ width: '44px', height: '44px', borderRadius: '50%' }} />
-                  <div>
-                    <div className="shimmer" style={{ width: '80px', height: '14px', marginBottom: '6px' }} />
-                    <div className="shimmer" style={{ width: '50px', height: '11px' }} />
-                  </div>
+              <div className="asset-row" onClick={() => setModal({ type: 'send', asset: 'USDC' })}>
+                <UsdcIcon />
+                <div className="asset-info">
+                  <div className="asset-name">USDC</div>
+                  <div className="asset-sub">USD Coin</div>
                 </div>
-              ) : (
-                <div className="asset-row" onClick={() => setModal({ type: 'send', asset: 'USDC' })}>
-                  <UsdcIcon />
-                  <div className="asset-info">
-                    <div className="asset-name">USDC</div>
-                    <div className="asset-sub">USD Coin</div>
-                  </div>
-                  <div className="asset-amount">
-                    <div className="asset-amount-main">{balanceHidden ? '••••••' : fmt(usdcN)}</div>
-                    {usdcN === 0 && (
-                      <div className="asset-amount-sub">Add money to start</div>
-                    )}
-                  </div>
+                <div className="asset-amount">
+                  <div className="asset-amount-main">{balanceHidden ? '••••' : fmtUsd(usdcN)}</div>
+                  {usdcN === 0 && <div className="asset-amount-sub">empty</div>}
                 </div>
-              )}
+              </div>
 
-              {/* Fund nudge when empty */}
-              {!isLoading && usdcN === 0 && (
+              {usdcN === 0 && (
                 <button
                   onClick={handleFund}
                   style={{
-                    width: '100%', marginTop: '16px',
-                    background: 'var(--accent)', border: 'none',
-                    borderRadius: '14px', padding: '15px',
-                    fontSize: '15px', fontWeight: 600, color: '#fff',
+                    marginTop: '20px', width: '100%',
+                    background: 'var(--accent)', border: 'none', borderRadius: '14px',
+                    padding: '15px', fontSize: '15px', fontWeight: 600, color: '#fff',
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                     transition: 'filter 0.15s',
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" /></svg>
-                  Add money
+                  Add money to get started
                 </button>
               )}
             </>
-          )}
+          )
+        )}
 
-          {activeTab === 'bitcoin' && (
+        {/* Bitcoin tab */}
+        {activeTab === 'bitcoin' && (
+          isLoading ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 0' }}>
+              <div className="shimmer" style={{ width: '42px', height: '42px', borderRadius: '12px' }} />
+              <div><div className="shimmer" style={{ width: '70px', height: '13px', marginBottom: '6px' }} /><div className="shimmer" style={{ width: '55px', height: '11px' }} /></div>
+            </div>
+          ) : (
             <>
-              {isLoading ? (
-                <div style={{ padding: '16px 0', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div className="shimmer" style={{ width: '44px', height: '44px', borderRadius: '50%' }} />
-                  <div>
-                    <div className="shimmer" style={{ width: '80px', height: '14px', marginBottom: '6px' }} />
-                    <div className="shimmer" style={{ width: '50px', height: '11px' }} />
-                  </div>
+              <div className="asset-row">
+                <BtcIcon />
+                <div className="asset-info">
+                  <div className="asset-name">Bitcoin</div>
+                  <div className="asset-sub">{balanceHidden ? '•••' : `${fmtBtc(btcN)} BTC`}</div>
                 </div>
-              ) : (
-                <div className="asset-row" onClick={() => btcN > 0 ? setModal({ type: 'sell' }) : setModal({ type: 'buy' })}>
-                  <BtcIcon />
-                  <div className="asset-info">
-                    <div className="asset-name">Bitcoin</div>
-                    <div className="asset-sub">{balanceHidden ? '•••' : `${fmtBtc(btcN)} BTC`}</div>
-                  </div>
-                  <div className="asset-amount">
-                    <div className="asset-amount-main">{balanceHidden ? '••••••' : fmt(btcUsd)}</div>
-                    {btcN === 0 && (
-                      <div className="asset-amount-sub">Tap to buy</div>
-                    )}
-                  </div>
+                <div className="asset-amount">
+                  <div className="asset-amount-main">{balanceHidden ? '••••' : fmtUsd(btcUsd)}</div>
+                  {btcN === 0 && <div className="asset-amount-sub">≈ {fmtUsd(BTC_PRICE_USD)}/BTC</div>}
                 </div>
-              )}
+              </div>
 
-              {/* Buy / Sell buttons */}
-              {!isLoading && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px' }}>
-                  <button
-                    onClick={() => setModal({ type: 'buy' })}
-                    style={{
-                      background: 'var(--accent)', border: 'none', borderRadius: '12px',
-                      padding: '13px', fontSize: '14px', fontWeight: 600, color: '#fff',
-                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                      transition: 'filter 0.15s',
-                    }}
-                  >
-                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                    Buy
-                  </button>
-                  <button
-                    onClick={() => setModal({ type: 'sell' })}
-                    disabled={btcN === 0}
-                    style={{
-                      background: 'var(--surface-2)', border: '1px solid var(--border)',
-                      borderRadius: '12px', padding: '13px', fontSize: '14px',
-                      fontWeight: 500, color: btcN === 0 ? 'var(--text-3)' : 'var(--text)',
-                      cursor: btcN === 0 ? 'not-allowed' : 'pointer',
-                      opacity: btcN === 0 ? 0.5 : 1,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                      transition: 'background 0.15s',
-                    }}
-                  >
-                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                    Sell
-                  </button>
-                </div>
-              )}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '16px' }}>
+                <button
+                  onClick={() => setModal({ type: 'buy' })}
+                  style={{
+                    background: 'var(--accent)', border: 'none', borderRadius: '12px',
+                    padding: '13px', fontSize: '14px', fontWeight: 600, color: '#fff',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                    transition: 'filter 0.15s',
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                  Buy
+                </button>
+                <button
+                  onClick={() => setModal({ type: 'sell' })}
+                  disabled={btcN === 0}
+                  style={{
+                    background: 'var(--surface-2)', border: '1px solid var(--border)',
+                    borderRadius: '12px', padding: '13px', fontSize: '14px',
+                    fontWeight: 500, color: btcN === 0 ? 'var(--text-3)' : 'var(--text)',
+                    cursor: btcN === 0 ? 'not-allowed' : 'pointer',
+                    opacity: btcN === 0 ? 0.5 : 1,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                    transition: 'background 0.15s',
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 7h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                  Sell
+                </button>
+              </div>
             </>
-          )}
-        </div>
+          )
+        )}
       </div>
 
       {/* Modals */}
       {modal?.type === 'send' && (
-        <SendModal
-          asset={modal.asset}
-          balance={modal.asset === 'BTC' ? btc : usdc}
-          onClose={() => setModal(null)}
-          onSend={async (to, amt) => { await handleSend(modal.asset, to, amt); }}
-        />
+        <SendModal asset={modal.asset} balance={modal.asset === 'BTC' ? btc : usdc} onClose={() => setModal(null)} onSend={async (to, amt) => { await handleSend(modal.asset, to, amt); }} />
       )}
       {modal?.type === 'receive' && address && (
         <ReceiveModal asset={modal.asset} address={address} onClose={() => setModal(null)} />
@@ -414,8 +386,8 @@ export function WalletDashboard() {
 
       {toast && <div className="toast">{toast}</div>}
       <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        @keyframes spin  { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
       `}</style>
     </div>
   );
