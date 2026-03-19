@@ -203,7 +203,7 @@ export function SendModal({ asset, balance, onClose, onSend }: SendModalProps) {
               </div>
             )}
 
-            {/* Gasless badge */}
+            {/* Free transfers badge */}
             <div
               style={{
                 display: 'flex',
@@ -217,7 +217,7 @@ export function SendModal({ asset, balance, onClose, onSend }: SendModalProps) {
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M7 1L1.5 7.5H7L6.5 13L12.5 6.5H7L7 1Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
               </svg>
-              No gas fees · Paid by Cavos
+              Transfer fees are on us
             </div>
 
             {/* Send button */}

@@ -95,12 +95,12 @@ export function WalletDashboard() {
 
   // Wallet status badge
   const statusLabel = walletStatus.isDeploying
-    ? 'Deploying…'
+    ? 'Setting up…'
     : walletStatus.isRegistering
-    ? 'Activating…'
+    ? 'Almost ready…'
     : walletStatus.isReady
-    ? 'Active'
-    : 'Pending';
+    ? 'Ready'
+    : 'Starting…';
 
   const statusColor = walletStatus.isReady
     ? '#3DD68C'
@@ -250,7 +250,7 @@ export function WalletDashboard() {
             fontFamily: 'DM Mono, monospace',
           }}
         >
-          Portfolio
+          My wallet
         </p>
 
         <div className="flex items-end gap-3 flex-wrap">
@@ -305,7 +305,7 @@ export function WalletDashboard() {
             fontFamily: 'DM Mono, monospace',
           }}
         >
-          Assets
+          Your coins
         </p>
 
         <AssetCard
@@ -341,7 +341,7 @@ export function WalletDashboard() {
             fontFamily: 'DM Mono, monospace',
           }}
         >
-          Starknet Mainnet · Gasless
+          Transfers are always free
         </p>
       </div>
 

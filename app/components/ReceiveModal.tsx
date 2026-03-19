@@ -157,7 +157,7 @@ export function ReceiveModal({ asset, address, onClose }: ReceiveModalProps) {
               marginBottom: '8px',
             }}
           >
-            Your Starknet address
+            Your wallet address
           </p>
           <p
             style={{
@@ -210,7 +210,7 @@ export function ReceiveModal({ asset, address, onClose }: ReceiveModalProps) {
             marginTop: '12px',
           }}
         >
-          Only send {asset} on Starknet to this address
+          Only send {asset} to this address
         </p>
       </div>
     </div>

@@ -81,16 +81,16 @@ export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
             fontWeight: 300,
           }}
         >
-          Hold Bitcoin and USDC without seed phrases,
+          Send and receive Bitcoin and USDC
           <br />
-          hardware wallets, or browser extensions.
+          with just your Google account.
           <br />
-          Just your Google account.
+          No passwords, no complicated setup.
         </p>
 
         {/* Feature pills */}
         <div className="flex flex-wrap gap-2 justify-center">
-          {['No seed phrases', 'Gasless txns', 'Self-custodial'].map((f) => (
+          {['No passwords', 'Free transfers', 'Your money, always'].map((f) => (
             <span
               key={f}
               className="tag"
@@ -134,7 +134,7 @@ export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
             lineHeight: 1.5,
           }}
         >
-          Powered by Starknet · Non-custodial · Open source
+          Your keys, your money · Free to use · Open source
         </p>
       </div>
     </div>
