@@ -32,7 +32,7 @@ export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
           style={{ filter: 'invert(1)', opacity: 0.55 }}
         />
         <span style={{
-          fontFamily: 'ui-monospace, "SF Mono", monospace',
+          fontFamily: '"JetBrains Mono", monospace',
           fontSize: '10px',
           letterSpacing: '0.16em',
           color: 'rgba(255,255,255,0.3)',
@@ -46,9 +46,9 @@ export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
       {/* ── Hero ── */}
       <div className="page-entry page-entry-delay-1" style={{ textAlign: 'center', padding: '0 4px' }}>
         <h1 style={{
-          fontFamily: 'Georgia, "Times New Roman", serif',
-          fontWeight: 700,
-          fontSize: 'clamp(42px, 12vw, 62px)',
+          fontFamily: '"Instrument Serif", Georgia, serif',
+          fontWeight: 400,
+          fontSize: 'clamp(44px, 12vw, 64px)',
           color: 'var(--text)',
           letterSpacing: '-0.03em',
           lineHeight: 1.05,
@@ -83,7 +83,7 @@ export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
               fontSize: '10px',
               fontWeight: 500,
               color: 'var(--text-3)',
-              fontFamily: 'ui-monospace, monospace',
+              fontFamily: '"JetBrains Mono", monospace',
               letterSpacing: '0.03em',
             }}>
               {f}
@@ -142,7 +142,7 @@ export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
           color: 'var(--text-3)',
           textAlign: 'center',
           lineHeight: 1.5,
-          fontFamily: 'ui-monospace, monospace',
+          fontFamily: '"JetBrains Mono", monospace',
           letterSpacing: '0.02em',
         }}>
           non-custodial · free to use

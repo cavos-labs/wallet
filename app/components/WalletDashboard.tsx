@@ -129,7 +129,7 @@ export function WalletDashboard() {
             style={{ filter: 'invert(1)', opacity: 0.6 }}
           />
           <span style={{
-            fontFamily: 'ui-monospace, monospace',
+            fontFamily: '"JetBrains Mono", monospace',
             fontSize: '10px',
             letterSpacing: '0.14em',
             color: 'var(--text-3)',
@@ -192,11 +192,11 @@ export function WalletDashboard() {
           </div>
         ) : (
           <p style={{
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            fontWeight: 700,
-            fontSize: 'clamp(44px, 12vw, 60px)',
+            fontFamily: '"Instrument Serif", Georgia, serif',
+            fontWeight: 400,
+            fontSize: 'clamp(48px, 13vw, 64px)',
             color: 'var(--text)',
-            letterSpacing: '-0.03em',
+            letterSpacing: '-0.02em',
             lineHeight: 1,
             marginBottom: '8px',
           }}>
@@ -231,7 +231,7 @@ export function WalletDashboard() {
               transition: 'border-color 0.15s',
             }}
           >
-            <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '11px', color: 'var(--text-2)' }}>
+            <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px', color: 'var(--text-2)' }}>
               {shortAddr}
             </span>
             {copied
