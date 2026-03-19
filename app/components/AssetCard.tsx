@@ -6,8 +6,6 @@ interface AssetCardProps {
   balance: string;
   usdValue: string;
   isLoading?: boolean;
-  onSend: () => void;
-  onReceive: () => void;
 }
 
 const ASSET_CONFIG = {
@@ -44,23 +42,22 @@ const ASSET_CONFIG = {
   },
 };
 
-export function AssetCard({
-  symbol,
-  name,
-  balance,
-  usdValue,
-  isLoading,
-  onSend,
-  onReceive,
-}: AssetCardProps) {
+function formatBtcBalance(raw: string): string {
+  const n = parseFloat(raw);
+  if (n === 0) return '0.0000';
+  if (n < 0.0001) return n.toFixed(8);
+  if (n < 0.001) return n.toFixed(6);
+  if (n < 1) return n.toFixed(4);
+  return n.toFixed(4);
+}
+
+export function AssetCard({ symbol, name, balance, usdValue, isLoading }: AssetCardProps) {
   const config = ASSET_CONFIG[symbol];
+  const displayBalance = symbol === 'BTC' ? formatBtcBalance(balance) : parseFloat(balance).toFixed(2);
 
   return (
-    <div
-      className="asset-card"
-      style={{ padding: '20px 24px' }}
-    >
-      {/* Ambient glow behind the icon */}
+    <div className="asset-card" style={{ padding: '20px 24px' }}>
+      {/* Ambient glow */}
       <div
         style={{
           position: 'absolute',
@@ -73,88 +70,36 @@ export function AssetCard({
         }}
       />
 
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          {config.icon}
-          <div>
-            <p style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text)' }}>{symbol}</p>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '1px' }}>{name}</p>
-          </div>
-        </div>
-
-        {/* Live indicator */}
-        <div className="flex items-center gap-1.5">
-          <span
-            style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: config.color,
-              boxShadow: `0 0 6px ${config.color}`,
-              display: 'inline-block',
-            }}
-          />
+      <div className="flex items-center gap-3">
+        {config.icon}
+        <div>
+          <p style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text)' }}>{symbol}</p>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '1px' }}>{name}</p>
         </div>
       </div>
 
       {/* Balance */}
       {isLoading ? (
-        <div>
+        <div style={{ marginTop: '16px' }}>
           <div className="shimmer" style={{ width: '120px', height: '32px', marginBottom: '6px' }} />
           <div className="shimmer" style={{ width: '80px', height: '18px' }} />
         </div>
       ) : (
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ marginTop: '16px' }}>
           <p
             className="font-display"
-            style={{
-              fontSize: '32px',
-              color: 'var(--text)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-            }}
+            style={{ fontSize: '32px', color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1.1 }}
           >
-            {balance}
+            {displayBalance}
             <span style={{ fontSize: '16px', marginLeft: '6px', color: 'var(--text-secondary)' }}>
               {symbol}
             </span>
           </p>
-          <p
-            style={{
-              fontSize: '13px',
-              color: 'var(--text-muted)',
-              marginTop: '4px',
-              fontFamily: 'DM Mono, monospace',
-            }}
-          >
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px', fontFamily: 'DM Mono, monospace' }}>
             {usdValue}
           </p>
         </div>
       )}
-
-      {/* Actions */}
-      <div className="flex gap-2">
-        <button
-          onClick={onSend}
-          className="btn-primary flex-1"
-          style={{ padding: '10px', fontSize: '13px', fontWeight: 500 }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M13 1L7 7m0 0L1 1m6 6v6m6-6H1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Send
-        </button>
-        <button
-          onClick={onReceive}
-          className="btn-ghost flex-1"
-          style={{ padding: '10px', fontSize: '13px' }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M1 13L7 7m0 0l6 6M7 7V1M1 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Receive
-        </button>
-      </div>
     </div>
   );
 }
