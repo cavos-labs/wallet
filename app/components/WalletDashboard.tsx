@@ -7,6 +7,7 @@ import { useCavos } from '@cavos/react';
 import { AssetCard } from './AssetCard';
 import { SendModal } from './SendModal';
 import { ReceiveModal } from './ReceiveModal';
+import { AssetPickerModal } from './AssetPickerModal';
 import { USDC_ADDRESS, WBTC_ADDRESS } from '../providers';
 
 // Mainnet RPC
@@ -17,6 +18,8 @@ const provider = new RpcProvider({
 type ModalState =
   | { type: 'send'; asset: 'BTC' | 'USDC' }
   | { type: 'receive'; asset: 'BTC' | 'USDC' }
+  | { type: 'pick-send' }
+  | { type: 'pick-receive' }
   | null;
 
 interface Balances {
@@ -25,7 +28,7 @@ interface Balances {
 }
 
 export function WalletDashboard() {
-  const { address, user, logout, execute, walletStatus } = useCavos();
+  const { address, user, logout, execute, getOnramp, walletStatus } = useCavos();
   const [modal, setModal] = useState<ModalState>(null);
   const [balances, setBalances] = useState<Balances>({ btc: '0.00000000', usdc: '0.00' });
   const [isLoadingBalances, setIsLoadingBalances] = useState(true);
@@ -91,6 +94,15 @@ export function WalletDashboard() {
     showToast(`Transaction sent · ${txHash.slice(0, 12)}…`);
     setTimeout(fetchBalances, 5000);
     return txHash;
+  };
+
+  const handleFund = () => {
+    try {
+      const url = getOnramp('RAMP_NETWORK');
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch {
+      showToast('Fund feature unavailable on testnet');
+    }
   };
 
   // Wallet status badge
@@ -234,7 +246,7 @@ export function WalletDashboard() {
         </div>
       </header>
 
-      {/* Portfolio summary */}
+      {/* Wallet summary */}
       <div
         className="page-entry page-entry-delay-1"
         style={{ paddingTop: '36px', paddingBottom: '8px' }}
@@ -253,45 +265,175 @@ export function WalletDashboard() {
           My wallet
         </p>
 
-        <div className="flex items-end gap-3 flex-wrap">
-          {/* Address chip */}
-          <div
+        {/* Address chip */}
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+            padding: '6px 10px',
+          }}
+        >
+          <span
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: '8px',
-              padding: '6px 10px',
-              marginTop: '4px',
+              fontFamily: 'DM Mono, monospace',
+              fontSize: '12px',
+              color: 'var(--text-muted)',
             }}
           >
-            <span
-              style={{
-                fontFamily: 'DM Mono, monospace',
-                fontSize: '12px',
-                color: 'var(--text-muted)',
-              }}
-            >
-              {shortAddress}
-            </span>
-          </div>
+            {shortAddress}
+          </span>
         </div>
       </div>
 
-      {/* Divider */}
+      {/* ── Action buttons ── */}
       <div
+        className="page-entry page-entry-delay-2"
         style={{
-          height: '1px',
-          background: 'var(--border)',
-          margin: '20px 0',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: '10px',
+          margin: '24px 0',
         }}
-      />
+      >
+        {/* Fund */}
+        <button
+          onClick={handleFund}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '16px',
+            padding: '16px 8px',
+            cursor: 'pointer',
+            transition: 'border-color 0.15s, background 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-hover)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)';
+          }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'rgba(61, 214, 140, 0.12)',
+              border: '1px solid rgba(61, 214, 140, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3v10M3 8h10" stroke="#3DD68C" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </div>
+          <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>
+            Fund
+          </span>
+        </button>
+
+        {/* Send */}
+        <button
+          onClick={() => setModal({ type: 'pick-send' })}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'var(--text)',
+            border: '1px solid transparent',
+            borderRadius: '16px',
+            padding: '16px 8px',
+            cursor: 'pointer',
+            transition: 'opacity 0.15s',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.88'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'rgba(10,10,12,0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 13l10-10M13 3H6M13 3v7" stroke="#0A0A0C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--bg)' }}>
+            Send
+          </span>
+        </button>
+
+        {/* Receive */}
+        <button
+          onClick={() => setModal({ type: 'pick-receive' })}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '16px',
+            padding: '16px 8px',
+            cursor: 'pointer',
+            transition: 'border-color 0.15s, background 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-hover)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)';
+          }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'rgba(39,117,202,0.12)',
+              border: '1px solid rgba(39,117,202,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M13 3L3 13M3 13h7M3 13V6" stroke="#2775CA" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>
+            Receive
+          </span>
+        </button>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: '1px', background: 'var(--border)', marginBottom: '20px' }} />
 
       {/* Asset cards */}
       <div
-        className="page-entry page-entry-delay-2 flex flex-col gap-4"
+        className="page-entry page-entry-delay-3 flex flex-col gap-4"
         style={{ flex: 1 }}
       >
         <p
@@ -331,21 +473,34 @@ export function WalletDashboard() {
 
       {/* Footer note */}
       <div
-        className="page-entry page-entry-delay-3"
+        className="page-entry page-entry-delay-4"
         style={{ marginTop: '32px', textAlign: 'center' }}
       >
-        <p
-          style={{
-            fontSize: '11px',
-            color: 'var(--text-muted)',
-            fontFamily: 'DM Mono, monospace',
-          }}
-        >
+        <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'DM Mono, monospace' }}>
           Transfers are always free
         </p>
       </div>
 
-      {/* Modals */}
+      {/* ── Modals ── */}
+
+      {/* Asset picker for top-level Send */}
+      {modal?.type === 'pick-send' && (
+        <AssetPickerModal
+          title="Send"
+          onSelect={(asset) => setModal({ type: 'send', asset })}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {/* Asset picker for top-level Receive */}
+      {modal?.type === 'pick-receive' && (
+        <AssetPickerModal
+          title="Receive"
+          onSelect={(asset) => setModal({ type: 'receive', asset })}
+          onClose={() => setModal(null)}
+        />
+      )}
+
       {modal?.type === 'send' && (
         <SendModal
           asset={modal.asset}
@@ -364,9 +519,7 @@ export function WalletDashboard() {
       )}
 
       {/* Toast */}
-      {toast && (
-        <div className="toast">{toast}</div>
-      )}
+      {toast && <div className="toast">{toast}</div>}
 
       <style>{`
         @keyframes pulse {
