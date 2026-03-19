@@ -9,95 +9,42 @@ interface LoginScreenProps {
 
 export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-between px-6 py-12 relative overflow-hidden">
-      {/* Background ambient */}
-      <div
-        className="pointer-events-none absolute"
-        style={{
-          top: '-80px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '500px',
-          height: '500px',
-          background: 'radial-gradient(ellipse, rgba(247,147,26,0.06) 0%, transparent 65%)',
-        }}
-      />
-      <div
-        className="pointer-events-none absolute"
-        style={{
-          bottom: '0',
-          right: '-80px',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(ellipse, rgba(39,117,202,0.06) 0%, transparent 65%)',
-        }}
-      />
+    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px 48px', maxWidth: '430px', margin: '0 auto' }}>
 
       {/* Logo */}
-      <div className="page-entry flex items-center gap-3">
-        <Image
-          src="/icon-black.png"
-          alt="Cavos"
-          width={32}
-          height={32}
-          className="opacity-90 invert"
-          style={{ filter: 'invert(1)' }}
-        />
-        <span
-          style={{
-            fontFamily: 'DM Mono, monospace',
-            fontSize: '13px',
-            letterSpacing: '0.12em',
-            color: 'var(--text-muted)',
-            textTransform: 'uppercase',
-          }}
-        >
+      <div style={{ paddingTop: '56px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Image src="/icon-black.png" alt="Cavos" width={28} height={28} style={{ filter: 'invert(1)', opacity: 0.8 }} />
+        <span style={{ fontFamily: 'ui-monospace, SF Mono, monospace', fontSize: '13px', letterSpacing: '0.1em', color: 'var(--text-2)', textTransform: 'uppercase' }}>
           Cavos
         </span>
       </div>
 
       {/* Hero */}
-      <div className="page-entry page-entry-delay-1 flex flex-col items-center text-center gap-6 max-w-sm">
-        <div style={{ lineHeight: 1.05 }}>
-          <h1
-            className="font-display"
-            style={{ fontSize: 'clamp(48px, 12vw, 72px)', color: 'var(--text)', letterSpacing: '-0.02em' }}
-          >
-            Your money.
-          </h1>
-          <h1
-            className="font-display"
-            style={{ fontSize: 'clamp(48px, 12vw, 72px)', color: 'var(--text-muted)', letterSpacing: '-0.02em' }}
-          >
-            Simple.
-          </h1>
-        </div>
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{ fontSize: 'clamp(42px, 12vw, 64px)', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.03em', lineHeight: 1.05, marginBottom: '20px' }}>
+          Your money.<br />
+          <span style={{ color: 'var(--text-2)' }}>Simple.</span>
+        </h1>
 
-        <p
-          style={{
-            fontSize: '15px',
-            color: 'var(--text-secondary)',
-            lineHeight: 1.6,
-            fontWeight: 300,
-          }}
-        >
-          Send and receive Bitcoin and USDC
-          <br />
+        <p style={{ fontSize: '16px', color: 'var(--text-2)', lineHeight: 1.6, fontWeight: 400, marginBottom: '32px' }}>
+          Send and receive Bitcoin and USDC<br />
           with just your Google account.
-          <br />
-          No passwords, no complicated setup.
         </p>
 
         {/* Feature pills */}
-        <div className="flex flex-wrap gap-2 justify-center">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
           {['No passwords', 'Free transfers', 'Your money, always'].map((f) => (
             <span
               key={f}
-              className="tag"
               style={{
-                background: 'var(--surface-2)',
+                background: 'var(--surface)',
                 border: '1px solid var(--border)',
-                color: 'var(--text-muted)',
+                borderRadius: '100px',
+                padding: '6px 14px',
+                fontSize: '12px',
+                fontWeight: 500,
+                color: 'var(--text-2)',
+                letterSpacing: '0.01em',
               }}
             >
               {f}
@@ -107,18 +54,38 @@ export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
       </div>
 
       {/* CTA */}
-      <div className="page-entry page-entry-delay-2 w-full max-w-sm flex flex-col gap-3">
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <button
           onClick={onConnect}
           disabled={isLoading}
-          className="btn-primary w-full"
-          style={{ padding: '16px', fontSize: '16px' }}
+          style={{
+            width: '100%',
+            background: isLoading ? 'var(--surface)' : 'var(--accent)',
+            border: 'none',
+            borderRadius: '14px',
+            padding: '16px',
+            fontSize: '16px',
+            fontWeight: 600,
+            color: isLoading ? 'var(--text-2)' : '#fff',
+            cursor: isLoading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            transition: 'filter 0.15s, transform 0.15s',
+            letterSpacing: '-0.01em',
+          }}
         >
           {isLoading ? (
-            <span style={{ opacity: 0.6 }}>Loading…</span>
+            <>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ animation: 'spin 1s linear infinite' }}>
+                <circle cx="9" cy="9" r="7" stroke="var(--text-2)" strokeWidth="2" strokeOpacity="0.3" />
+                <path d="M9 2a7 7 0 017 7" stroke="var(--text-2)" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              Loading…
+            </>
           ) : (
             <>
-              {/* Google logo */}
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
                 <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
@@ -130,17 +97,12 @@ export function LoginScreen({ onConnect, isLoading }: LoginScreenProps) {
           )}
         </button>
 
-        <p
-          style={{
-            fontSize: '12px',
-            color: 'var(--text-muted)',
-            textAlign: 'center',
-            lineHeight: 1.5,
-          }}
-        >
-          Your keys, your money · Free to use · Open source
+        <p style={{ fontSize: '12px', color: 'var(--text-3)', textAlign: 'center', lineHeight: 1.5 }}>
+          Your keys, your money · Free to use
         </p>
       </div>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
